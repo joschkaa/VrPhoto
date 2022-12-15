@@ -1,18 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using Grabbing;
 using UnityEngine;
 
-public class Grabbable : MonoBehaviour
+public class Grabbable : MonoBehaviour, IGrabbable
 {
-    // Start is called before the first frame update
-    void Start()
+    private Transform _oldParent;
+    private Rigidbody _rigidbody;
+    private bool _kinematic;
+    private GameObject _currentGrabber;
+    
+    public void Start()
     {
-        
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void GrabberEnter(GameObject grabber)
     {
-        
+    }
+
+    public void GrabberExit(GameObject grabber)
+    {
+    }
+
+    public void GrabberGrab(GameObject grabber)
+    {
+        if (_currentGrabber != null) GrabberRelease(_currentGrabber);
+        _currentGrabber = grabber;
+        _oldParent = transform.parent;
+        transform.SetParent(grabber.transform);
+
+        _kinematic = _rigidbody.isKinematic;
+        _rigidbody.isKinematic = true;
+    }
+
+    public void GrabberRelease(GameObject grabber)
+    {
+        if (_currentGrabber != grabber) return;
+        transform.SetParent(_oldParent);
+        _oldParent = null;
+
+        _rigidbody.isKinematic = _kinematic;
     }
 }
